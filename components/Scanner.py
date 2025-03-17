@@ -32,4 +32,4 @@ class Scanner:
                 "image": image
             }
         )
-        logger.debug(f'classified bird as {result[0]['model_1_predictions'][0]['top']}')
+        logger.debug(f'classified bird as {result[0]["model_1_predictions"][0]["top"]}')
