@@ -1,9 +1,11 @@
+from MainSystem import MainSystem
+
 class Robot:
     def __init__(self) -> None:
-        return
+        self.system = MainSystem()
 
     def loop(self):
-        return
+        self.system.loop()
 
 if __name__ == '__main__':
     robot = Robot()
