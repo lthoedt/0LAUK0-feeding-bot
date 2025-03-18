@@ -4,6 +4,10 @@ logger = logging.getLogger(__name__)
 from inference_sdk import InferenceHTTPClient
 
 class Scanner:
+    # A bird blacklist: list of denied bird's model classes
+    # See dataset for valid class names
+    deniedBirds = [ 'ekster', 'kraai' ]
+
     def __init__(self) -> None:
         # Connect to the Roboflow docker client
         self.CLIENT = InferenceHTTPClient(
@@ -32,4 +36,27 @@ class Scanner:
                 "image": image
             }
         )
-        logger.debug(f'classified bird as {result[0]["model_1_predictions"][0]["top"]}')
+        logger.debug('Received result from roboflow: %s', result)
+
+        if result[0]["bird_class"] == []:
+            # No birds were classified with a satisfactory confidence
+            # This also means no denied birds were detected
+            return False
+
+        # Get the bird class from the model prediction and store it for logging purposes
+        foundBird = result[0]["bird_class"][0]["top"]
+        logger.debug('classified a bird as \'%s\'', foundBird)
+        self._storeImage(image, foundBird)
+
+        if foundBird in Scanner.deniedBirds:
+            # Our model has detected a bird, and the reported class is in the list
+            # of denied birds
+            return True
+        else:
+            # Our model has detected a bird, but it is not in the list of denied birds
+            return False
+
+    def _storeImage(self, image, birdClass):
+        # TODO: implement
+        logger.debug('method not yet implemented')
+        pass
