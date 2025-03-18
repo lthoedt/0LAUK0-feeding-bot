@@ -1,13 +1,14 @@
 import logging
 logger = logging.getLogger(__name__)
 
+
 class Camera:
     def __init__(self):
         # TODO: implement
         # In this function, add any commands/logic that need to happen
         # to set up the camera and have it running
         pass
-    
+
     def getImage(self):
         # TODO: implement
         # In this function, get an image from the camera and return it
