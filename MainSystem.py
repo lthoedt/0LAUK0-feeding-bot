@@ -3,15 +3,18 @@ logger = logging.getLogger(__name__)
 
 from States import States
 import StateMethods
+from components.Camera import Camera
+from components.Classifier import Classifier
 from components.Door import Door
-from components.Scanner import Scanner
 
 class MainSystem:
     def __init__(self) -> None:
         logger.debug('Initialising main system ...')
         self.CURRENT_STATE = States.SCANNING
+        self.camera = Camera()
+        self.classifier = Classifier()
         self.door = Door()
-        self.scanner = Scanner()
+        logger.debug('Finished initialising main system')
 
 
     def loop(self) -> None:
@@ -24,7 +27,7 @@ class MainSystem:
         match self.CURRENT_STATE:
             case States.SCANNING:
                 StateMethods.ScanningState.do(self)
-                if (self.scanner.deniedBirdDetected()):
+                if (self._deniedBirdDetected()):
                     StateMethods.ScanningState.exit(self)
                     self.CURRENT_STATE = States.DENYING_BIRD
                     StateMethods.DenyingBirdState.entry(self)
@@ -41,8 +44,11 @@ class MainSystem:
             case States.DENYING_BIRD:
                 # Do
                 StateMethods.DenyingBirdState.do(self)
-                if (self.scanner.deniedBirdDetected() != True):
+                if (self._deniedBirdDetected() != True):
                     # Exit
                     StateMethods.DenyingBirdState.exit(self)
                     self.CURRENT_STATE = States.ACCEPTING_BIRD
                     StateMethods.AcceptingBirdState.entry(self)
+
+    def _deniedBirdDetected(self):
+        return self.classifier.isDeniedBird(self.camera.getImage())

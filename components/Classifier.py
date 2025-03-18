@@ -3,7 +3,7 @@ logger = logging.getLogger(__name__)
 
 from inference_sdk import InferenceHTTPClient
 
-class Scanner:
+class Classifier:
     # A bird blacklist: list of denied bird's model classes
     # See dataset for valid class names
     deniedBirds = [ 'ekster', 'kraai' ]
@@ -21,7 +21,12 @@ class Scanner:
         server_info = self.CLIENT.get_server_info()
         logger.info(f'Connected to local roboflow container (name: {server_info.name}, version: {server_info.version})')
 
-    def deniedBirdDetected(self, image) -> bool | None:
+    def isDeniedBird(self, image) -> bool | None:
+        # The input image must be in either of the following formats:
+        # 1. PIL Image object
+        # 2. base64 encoded in-memory image file (a bytes object)
+        # 3. A filepath (string) to an image
+
         # Run the roboflow workflow
         # This workflow was configured by Mihai and uses three steps:
         # 1. object detection
@@ -41,20 +46,15 @@ class Scanner:
         if result[0]["bird_class"] == []:
             # No birds were classified with a satisfactory confidence
             # This also means no denied birds were detected
-            return False
+            return None    # This is a false-y value in Python
 
         # Get the bird class from the model prediction and store it for logging purposes
         foundBird = result[0]["bird_class"][0]["top"]
         logger.debug('classified a bird as \'%s\'', foundBird)
         self._storeImage(image, foundBird)
 
-        if foundBird in Scanner.deniedBirds:
-            # Our model has detected a bird, and the reported class is in the list
-            # of denied birds
-            return True
-        else:
-            # Our model has detected a bird, but it is not in the list of denied birds
-            return False
+        # Return true if the bird class is present in the blacklist
+        return foundBird in Classifier.deniedBirds
 
     def _storeImage(self, image, birdClass):
         # TODO: implement
