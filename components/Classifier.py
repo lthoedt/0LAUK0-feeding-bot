@@ -14,7 +14,8 @@ class Classifier:
         # Connect to the Roboflow docker client
         self.CLIENT = InferenceHTTPClient(
             # this requires the docker container to currently be running
-            api_url="http://localhost:9001",
+            # this should probably be a command line option ...
+            api_url="http://192.168.137.72:9001",
             # this key is from Mihai's account
             api_key="pEB4QtUJhSfoq0RI6zDp",
         )
@@ -46,15 +47,18 @@ class Classifier:
             },
         )
         logger.debug("Received result from roboflow: %s", result)
+        image.save('imagefile.jpg')
 
         if result[0]["bird_class"] == []:
             # No birds were classified with a satisfactory confidence
             # This also means no denied birds were detected
+            logger.error("NO BIRD")
             return None  # This is a false-y value in Python
 
         # Get the bird class from the model prediction and store it for logging purposes
         foundBird = result[0]["bird_class"][0]["top"]
         logger.debug("classified a bird as '%s'", foundBird)
+        logger.error("BIRD: %s\t\tCONF: %0.2f", foundBird, result[0]["bird_class"][0]["confidence"])
         self._storeImage(image, foundBird)
 
         # Return true if the bird class is present in the blacklist
