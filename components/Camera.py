@@ -1,7 +1,7 @@
 import logging
 logger = logging.getLogger(__name__)
 
-from picamera2 import PiCamera2
+from picamera2 import Picamera2
 from time import sleep
 
 
@@ -11,8 +11,8 @@ class Camera:
         # In this function, add any commands/logic that need to happen
         # to set up the camera and have it running
         logger.debug("Starting camera ...")
-        self.camera = PiCamera2()
-        self.camera.start()
+        self.picamera = Picamera2()
+        self.picamera.start()
         sleep(1)  # We wait a little to ensure the camera is actually started
 
     def getImage(self):
@@ -23,4 +23,4 @@ class Camera:
 
         # This command is blocking
         logger.debug("Capturing image ...")
-        return self.camera.capture_image("main")
+        return self.picamera.capture_image("main")

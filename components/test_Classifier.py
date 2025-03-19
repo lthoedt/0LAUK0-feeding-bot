@@ -1,7 +1,7 @@
 import logging
 import unittest
 
-from .Classifier import Classifier
+from Classifier import Classifier
 
 
 class TestClassifier(unittest.TestCase):
