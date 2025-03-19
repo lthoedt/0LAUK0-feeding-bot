@@ -1,19 +1,26 @@
 import logging
 logger = logging.getLogger(__name__)
 
+from picamera2 import PiCamera2
+from time import sleep
+
 
 class Camera:
     def __init__(self):
         # TODO: implement
         # In this function, add any commands/logic that need to happen
         # to set up the camera and have it running
-        pass
+        logger.debug("Starting camera ...")
+        self.camera = PiCamera2()
+        self.camera.start()
+        sleep(1)  # We wait a little to ensure the camera is actually started
 
     def getImage(self):
-        # TODO: implement
         # In this function, get an image from the camera and return it
         # in the form of a PIL Image, a base64 encoded in-memory file,
         # or a filepath to an image.
         # (those are the formats required for roboflow)
-        # For now, it returns a reference local (static) image of a crow
-        return "wateenkraai.jpg"
+
+        # This command is blocking
+        logger.debug("Capturing image ...")
+        return self.camera.capture_image("main")
