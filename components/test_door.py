@@ -17,4 +17,4 @@ class TestDoor:
                     isClosing = True
 
 if __name__ == "__main__":
-    TestDoor.test()
+    TestDoor().test()
