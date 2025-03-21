@@ -3,18 +3,25 @@ logger = logging.getLogger(__name__)
 
 from States import States
 import StateMethods
-from components.Camera import Camera
+from config import DRY_RUN
+from components.Camera import Camera, FakeCamera
 from components.Classifier import Classifier
-from components.Door import Door
+from components.Door import Door, FakeDoor
 
 
 class MainSystem:
     def __init__(self) -> None:
         logger.debug("Initialising main system ...")
         self.CURRENT_STATE = States.SCANNING
-        self.camera = Camera()
+
         self.classifier = Classifier()
-        self.door = Door()
+        if not DRY_RUN:
+            self.camera = Camera()
+            self.door = Door()
+        else:
+            self.camera = FakeCamera()
+            self.door = FakeDoor()
+
         logger.debug("Finished initialising main system")
 
     def loop(self) -> None:
