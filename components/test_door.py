@@ -1,4 +1,4 @@
-from components.Door import Door
+from .Door import Door
 
 class TestDoor:
     self.door = Door()
