@@ -8,7 +8,7 @@ class ServoWrapper:
 
     def __init__(self, pin, speed) -> None:
         self.pin = pin
-        self.speed = mapSpeedToMillis(speed)
+        self.speed = self.mapSpeedToMillis(speed)
 
         self.pwm = pigpio.pi()
         self.pwm.set_mode(self.pin, pigpio.OUTPUT)
@@ -35,6 +35,6 @@ class ServoWrapper:
                 self.pwm.set_PWM_frequency( self.pin, 0 )
             self.previousMillis = currentMillis
         
-        self.pwm.set_servo_pulsewidth( self.pin, mapAngleToDutyCycle(self.currentAngle) )
+        self.pwm.set_servo_pulsewidth( self.pin, self.mapAngleToDutyCycle(self.currentAngle) )
 
         return self.currentAngle == angle
