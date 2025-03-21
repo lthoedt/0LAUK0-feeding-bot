@@ -15,10 +15,10 @@ class ServoWrapper:
         self.pwm.set_PWM_frequency(self.pin, 50)
 
     # 1 is 0 delay, 0 is 40 milliseconds
-    def mapSpeedToMillis(self, speed) -> int:
+    def mapSpeedToMillis(self, speed) -> float:
         return (1 - speed) * 40
 
-    def mapAngleToDutyCycle(self, angle) -> Number:
+    def mapAngleToDutyCycle(self, angle) -> float:
         return (angle / 180) * 2000 + 500
 
     def goToAngle(self, angle):
@@ -33,7 +33,7 @@ class ServoWrapper:
             else:
                 self.pwm.set_PWM_dutycycle( self.pin, 0 )
                 self.pwm.set_PWM_frequency( self.pin, 0 )
-                
+
             self.previousMillis = currentMillis
         
         self.pwm.set_servo_pulsewidth( self.pin, self.mapAngleToDutyCycle(self.currentAngle) )
