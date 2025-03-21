@@ -33,6 +33,7 @@ class ServoWrapper:
             else:
                 self.pwm.set_PWM_dutycycle( self.pin, 0 )
                 self.pwm.set_PWM_frequency( self.pin, 0 )
+                
             self.previousMillis = currentMillis
         
         self.pwm.set_servo_pulsewidth( self.pin, self.mapAngleToDutyCycle(self.currentAngle) )

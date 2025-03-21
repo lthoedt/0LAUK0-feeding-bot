@@ -23,7 +23,6 @@ class Door:
     def isClosed(self) -> bool:
         return self.servo.currentAngle == self.closedAngle
 
-
 class FakeDoor(Door):
     def __init__(self) -> None:
         self.state = "open"
