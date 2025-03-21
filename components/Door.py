@@ -9,7 +9,7 @@ class Door:
     closedAngle = 0
 
     def __init__(self) -> None:
-        self.servo = ServoWrapper(18, 0.5)
+        self.servo = ServoWrapper(12, 0.4)
 
     def open(self) -> None:
         logger.info("opening ...")

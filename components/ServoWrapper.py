@@ -16,7 +16,7 @@ class ServoWrapper:
 
     # 1 is 0 delay, 0 is 40 milliseconds
     def mapSpeedToMillis(self, speed) -> float:
-        return (1 - speed) * 40
+        return (1 - speed) * 80
 
     def mapAngleToDutyCycle(self, angle) -> float:
         return (angle / 180) * 2000 + 500
