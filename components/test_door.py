@@ -1,18 +1,20 @@
-from .Door import Door
+from Door import Door
 
 class TestDoor:
-    self.door = Door()
+    def __init__(self) -> None:
+        self.door = Door()
 
-    def test():
-        i = 0
+    def test(self):
+        isClosing = False
         while True:
-            if (self.door.isClosed()):
-                self.door.open()
-            elif (self.door.isOpen()):
+            if (isClosing):
                 self.door.close()
-            i += 1
-            if (i > 2):
-                break
+                if (self.door.isClosed()):
+                    isClosing = False
+            else:
+                self.door.open()
+                if (self.door.isOpen()):
+                    isClosing = True
 
 if __name__ == "__main__":
     TestDoor.test()
