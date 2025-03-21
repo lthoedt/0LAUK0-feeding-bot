@@ -1,8 +1,12 @@
 import logging
-
 logger = logging.getLogger(__name__)
 
+from config import ROBOFLOW_HOST, TIME_BETWEEN_STORED_IMAGES, STORED_IMAGE_RESOLUTION
+from datetime import datetime
 from inference_sdk import InferenceHTTPClient
+from os import makedirs
+from PIL.Image import Image
+from shutil import disk_usage
 
 
 class Classifier:
@@ -11,11 +15,17 @@ class Classifier:
     deniedBirds = ["ekster", "kraai"]
 
     def __init__(self) -> None:
+        # Initialise variables for storing images
+        self._last_image_class = ""
+        self._last_image_time = datetime.now()
+        # Ensure the image storing directory is available
+        makedirs("capturedimages", exist_ok=True)
+
         # Connect to the Roboflow docker client
         self.CLIENT = InferenceHTTPClient(
             # this requires the docker container to currently be running
             # this should probably be a command line option ...
-            api_url="http://192.168.137.72:9001",
+            api_url=ROBOFLOW_HOST,
             # this key is from Mihai's account
             api_key="pEB4QtUJhSfoq0RI6zDp",
         )
@@ -47,7 +57,6 @@ class Classifier:
             },
         )
         logger.debug("Received result from roboflow: %s", result)
-        image.save('imagefile.jpg')
 
         if result[0]["bird_class"] == []:
             # No birds were classified with a satisfactory confidence
@@ -58,13 +67,45 @@ class Classifier:
         # Get the bird class from the model prediction and store it for logging purposes
         foundBird = result[0]["bird_class"][0]["top"]
         logger.debug("classified a bird as '%s'", foundBird)
-        logger.error("BIRD: %s\t\tCONF: %0.2f", foundBird, result[0]["bird_class"][0]["confidence"])
+        logger.info(
+            "BIRD: %s\t\tCONF: %0.2f",
+            foundBird,
+            result[0]["bird_class"][0]["confidence"],
+        )
         self._storeImage(image, foundBird)
 
         # Return true if the bird class is present in the blacklist
         return foundBird in Classifier.deniedBirds
 
-    def _storeImage(self, image, birdClass):
-        # TODO: implement
-        logger.debug("method not yet implemented")
-        pass
+    def _storeImage(self, image: Image, birdClass: str):
+        """
+        Stores an images of a bird that has been classified.
+        Note: performs an in-place operation; do not call if image is still needed.
+
+        Specifications:
+        - Stores images at a configurable maximum frequency
+        - Does not store an image if the bird has not changed since last time
+        - Does not store an image if we have less than 1G free
+        - Stores images in a configurable resolution (should be small, 128x128 or 320x320)
+        """
+
+        # Check if enough time has passed
+        time_diff = datetime.now() - self._last_image_time
+        if time_diff.total_seconds() <= TIME_BETWEEN_STORED_IMAGES:
+            return
+        # Check if there is enough disk space
+        if disk_usage("capturedimages").free <= 1_000_000_000:  # 1 GB
+            return
+        # Check if the class has changed
+        if birdClass == self._last_image_class:
+            return
+        # Checks passed -- store image
+        self._last_image_class = birdClass
+        self._last_image_time = datetime.now()
+
+        # Scale (stretch) image. Note: in-place operation (we don't need the image anymore)
+        image.thumbnail(size=STORED_IMAGE_RESOLUTION)
+        name = f"capturedimages/{self._last_image_time.isoformat()}-{birdClass}.jpg"
+        logger.debug("stored image under %s", name)
+
+        image.save(name)

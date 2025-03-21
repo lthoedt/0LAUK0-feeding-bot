@@ -1,7 +1,10 @@
 import logging
 logger = logging.getLogger(__name__)
 
-from picamera2 import Picamera2
+try:  # This shitty try-except block makes this thing 'run' on PC
+    from picamera2 import Picamera2
+except:
+    pass
 from time import sleep
 
 
@@ -24,3 +27,16 @@ class Camera:
         # This command is blocking
         logger.debug("Capturing image ...")
         return self.picamera.capture_image("main")
+
+
+class FakeCamera(Camera):
+    def __init__(self):
+        pass
+
+    def getImage(self):
+        from random import choice
+        import PIL
+
+        random_image = choice(["geenvogel.jpg", "wateenkraai.jpg", "wateenmus.jpg"])
+        logger.debug("Random image sent %s", random_image)
+        return PIL.Image.open(random_image)
