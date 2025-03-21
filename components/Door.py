@@ -12,16 +12,16 @@ class Door:
         self.servo = ServoWrapper(18, 0.5)
 
     def open(self) -> None:
-        self.servo.goToAngle(openedAngle)
+        self.servo.goToAngle(self.openedAngle)
 
     def isOpen(self) -> bool:
-        return currentAngle == openedAngle
+        return self.servo.currentAngle == self.openedAngle
 
     def close(self) -> None:
-        self.servo.goToAngle(closedAngle)
+        self.servo.goToAngle(self.closedAngle)
 
     def isClosed(self) -> bool:
-        return currentAngle == closedAngle
+        return self.servo.currentAngle == self.closedAngle
 
 
 class FakeDoor(Door):
