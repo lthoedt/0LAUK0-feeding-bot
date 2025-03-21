@@ -1,4 +1,4 @@
-from ServoWrapper import ServoWrapper
+from .ServoWrapper import ServoWrapper
 import logging
 
 logger = logging.getLogger(__name__)

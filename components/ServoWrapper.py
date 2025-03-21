@@ -1,5 +1,4 @@
 import time
-from Camera import Camera
 import RPi.GPIO as GPIO
 import pigpio
 
