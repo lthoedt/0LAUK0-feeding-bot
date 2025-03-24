@@ -43,7 +43,6 @@ class ServoWrapper(Component):
                 self.currentAngle -= 1
             self.pwm.set_servo_pulsewidth( self.pin, self.mapAngleToDutyCycle(self.currentAngle) )
             time.sleep(self.speed / 1000)
-            print(self.currentAngle)
         else:
             # Servo is done moving
             self.pwm.set_PWM_dutycycle( self.pin, 0 )
