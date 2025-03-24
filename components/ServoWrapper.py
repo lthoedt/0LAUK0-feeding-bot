@@ -7,7 +7,6 @@ import queue
 from Component import Component
 
 targetAngleQueue = queue.Queue()
-currentAngleQueue = queue.Queue()
 
 class ServoWrapper(Component):
     currentAngle = 0
