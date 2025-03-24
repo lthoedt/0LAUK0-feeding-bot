@@ -3,7 +3,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
 class Door:
     openedAngle = 90
     closedAngle = 0
@@ -18,7 +17,7 @@ class Door:
     def isOpen(self) -> bool:
         isOpen = self.servo.currentAngle == self.openedAngle
         if isOpen:
-            logger.info("open")
+            logger.info("opened")
         return isOpen
 
     def close(self) -> None:

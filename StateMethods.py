@@ -22,18 +22,18 @@ class ScanningState(StateMethod):
 
 class AcceptingBirdState(StateMethod):
     def entry(mainSystem):
+        mainSystem.door.open()
         pass
     def do(mainSystem):
-        mainSystem.door.open()
         pass
     def exit(mainSystem):
         pass
 
 class DenyingBirdState(StateMethod):
     def entry(mainSystem):
+        mainSystem.door.close()
         pass
     def do(mainSystem):
-        mainSystem.door.close()
         pass
     def exit(mainSystem):
         pass
