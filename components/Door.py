@@ -1,28 +1,35 @@
+from ServoWrapper import ServoWrapper
 import logging
 
 logger = logging.getLogger(__name__)
 
 
 class Door:
+    openedAngle = 90
+    closedAngle = 0
+
     def __init__(self) -> None:
-        return
+        self.servo = ServoWrapper(12, 0.4)
 
     def open(self) -> None:
-        # TODO: Implement
-        return
+        logger.info("opening ...")
+        self.servo.goToAngle(self.openedAngle)
 
     def isOpen(self) -> bool:
-        # TODO: Implement
-        return True
+        isOpen = self.servo.currentAngle == self.openedAngle
+        if isOpen:
+            logger.info("open")
+        return isOpen
 
     def close(self) -> None:
-        # TODO: Implement
-        return
+        logger.info("closing ...")
+        self.servo.goToAngle(self.closedAngle)
 
     def isClosed(self) -> bool:
-        # TODO: Implement
-        return True
-
+        isClosed = self.servo.currentAngle == self.closedAngle
+        if isClosed:
+            logger.info("closed")
+        return isClosed
 
 class FakeDoor(Door):
     def __init__(self) -> None:
