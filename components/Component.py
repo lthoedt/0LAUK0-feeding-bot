@@ -2,6 +2,7 @@ import threading
 import queue
 
 class Component:
+    queue = None
     def __init__(self):
         self.queue = queue.Queue()
         def worker(component : Component):
@@ -11,7 +12,8 @@ class Component:
                     latestQueueItem = self.queue.get()
                     pass
 
-                component.run(latestQueueItem)
+                if component.run(latestQueueItem):
+                    latestQueueItem = None
                 
         self.thread = threading.Thread(target=worker, daemon=True, args=(self,))
         self.thread.start()

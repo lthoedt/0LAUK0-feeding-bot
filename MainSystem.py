@@ -25,6 +25,16 @@ class MainSystem:
         logger.debug("Finished initialising main system")
 
     def loop(self) -> None:
+        # Instruct camera to take a picture
+        self.camera.takePicture()
+
+        # Load the latest image from the camera which can be None if the camera is still busy
+        latestImage = self.camera.getImage()
+
+        isDeniedBirdDetected = None
+        if latestImage is not None:
+            isDeniedBirdDetected = self.classifier.isDeniedBird(latestImage)
+
         # State machine
         # In each case the corresponding State class is called
         # The state class will have an entry, do, and exit method
@@ -34,7 +44,7 @@ class MainSystem:
         match self.CURRENT_STATE:
             case States.SCANNING:
                 StateMethods.ScanningState.do(self)
-                if self._deniedBirdDetected():
+                if isDeniedBirdDetected:
                     StateMethods.ScanningState.exit(self)
                     self.CURRENT_STATE = States.DENYING_BIRD
                     StateMethods.DenyingBirdState.entry(self)
@@ -51,11 +61,12 @@ class MainSystem:
             case States.DENYING_BIRD:
                 # Do
                 StateMethods.DenyingBirdState.do(self)
-                if not self._deniedBirdDetected():
+                if not isDeniedBirdDetected:
                     # Exit
                     StateMethods.DenyingBirdState.exit(self)
                     self.CURRENT_STATE = States.ACCEPTING_BIRD
                     StateMethods.AcceptingBirdState.entry(self)
 
-    def _deniedBirdDetected(self):
-        return self.classifier.isDeniedBird(self.camera.getImage())
+        # This image is now processed by the statemachine and is therefore old
+        latestImage = None
+        isDeniedBirdDetected = None
