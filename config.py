@@ -9,3 +9,5 @@ ROBOFLOW_HOST = "http://localhost:9001"
 TIME_BETWEEN_STORED_IMAGES = 1.0
 # Resolution of stored images
 STORED_IMAGE_RESOLUTION = (128, 128)
+
+CLOSED_DOOR_TIMEOUT = 20

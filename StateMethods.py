@@ -1,3 +1,5 @@
+import time
+
 # We can't import MainSystem here due to Python's limitations
 # around circular imports
 # from MainSystem import MainSystem
@@ -30,10 +32,17 @@ class AcceptingBirdState(StateMethod):
         pass
 
 class DenyingBirdState(StateMethod):
+    # This maybe isnt nice as it is now static
+    # But making these classes objects seems a bit wrong as well
+    timeSinceLastDeniedBird = 0
     def entry(mainSystem):
+        DenyingBirdState.timeSinceLastDeniedBird = time.time()
         mainSystem.door.close()
         pass
     def do(mainSystem):
         pass
     def exit(mainSystem):
         pass
+
+    def secondsSinceLastDeniedBird(self):
+        return time.time() - DenyingBirdState.timeSinceLastDeniedBird

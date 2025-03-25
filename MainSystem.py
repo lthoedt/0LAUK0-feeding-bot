@@ -3,11 +3,10 @@ logger = logging.getLogger(__name__)
 
 from States import States
 import StateMethods
-from config import DRY_RUN
+from config import DRY_RUN, CLOSED_DOOR_TIMEOUT
 from components.Camera import Camera, FakeCamera
 from components.Classifier import Classifier
 from components.Door import Door, FakeDoor
-
 
 class MainSystem:
     def __init__(self) -> None:
@@ -53,7 +52,7 @@ class MainSystem:
             case States.ACCEPTING_BIRD:
                 # Do
                 StateMethods.AcceptingBirdState.do(self)
-                
+
                 if isDeniedBirdDetected:
                     # Exit
                     StateMethods.AcceptingBirdState.exit(self)
@@ -69,7 +68,7 @@ class MainSystem:
             case States.DENYING_BIRD:
                 # Do
                 StateMethods.DenyingBirdState.do(self)
-                if not isDeniedBirdDetected:
+                if not isDeniedBirdDetected and StateMethods.DenyingBirdState.secondsSinceLastDeniedBird(self) > CLOSED_DOOR_TIMEOUT:
                     # Exit
                     StateMethods.DenyingBirdState.exit(self)
                     self.CURRENT_STATE = States.ACCEPTING_BIRD
