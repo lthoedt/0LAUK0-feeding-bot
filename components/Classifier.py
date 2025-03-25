@@ -7,14 +7,15 @@ from inference_sdk import InferenceHTTPClient
 from os import makedirs
 from PIL.Image import Image
 from shutil import disk_usage
+from Component import Component
 
-
-class Classifier:
+class Classifier(Component):
     # A bird blacklist: list of denied bird's model classes
     # See dataset for valid class names
     deniedBirds = ["ekster", "kraai"]
 
     def __init__(self) -> None:
+        super().__init__()
         # Initialise variables for storing images
         self._last_image_class = ""
         self._last_image_time = datetime.now()
@@ -36,7 +37,16 @@ class Classifier:
             f"Connected to local roboflow container (name: {server_info.name}, version: {server_info.version})"
         )
 
-    def isDeniedBird(self, image) -> bool | None:
+    def run(self, queueItem) -> any:
+        if queueItem != None:
+            return self._isDeniedBird(queueItem)
+        return None        
+
+    def scanImage(self, image) -> bool | None:
+        if self.queue.empty():
+            self.use(image)
+
+    def _isDeniedBird(self, image) -> bool | None:
         # The input image must be in either of the following formats:
         # 1. PIL Image object
         # 2. base64 encoded in-memory image file (a bytes object)

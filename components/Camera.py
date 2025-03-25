@@ -10,7 +10,6 @@ from time import sleep
 from Component import Component
 
 class Camera(Component):
-    isCapturing = False
     def __init__(self):
         super().__init__()
         # TODO: implement
@@ -26,26 +25,19 @@ class Camera(Component):
     # This method returns the latest image taken by the camera
     # Once the image is read it is removed this prevents the same image being read multiple times
     def getImage(self):
-        image = self._image
-        self._image = None
-        return image
+        return self.getResult()
     
     def setImage(self, image):
-        self._image = image
+        self.setResult(image)
 
-    def run(self, queueItem) -> bool:
-        if self.isCapturing:
-            return False
-
+    def run(self, queueItem) -> any:
         if queueItem != None:
-            self.isCapturing = True
-            self._takePicture()
-            self.isCapturing = False
+            return self._takePicture()
 
-        return True
+        return None
     
     # This method actually take the picture
-    def _takePicture(self):
+    def _takePicture(self) -> any:
         # In this function, get an image from the camera and return it
         # in the form of a PIL Image, a base64 encoded in-memory file,
         # or a filepath to an image.
@@ -53,7 +45,7 @@ class Camera(Component):
 
         # This command is blocking
         logger.debug("Capturing image ...")
-        self.setImage(self.picamera.capture_image("main"))
+        return self.picamera.capture_image("main")
 
     # This method makes a request to take a picture, can be called multiple times which wont result in multiple pictures being taken
     def takePicture(self):
@@ -66,10 +58,10 @@ class FakeCamera(Camera):
         super().__init__()
         pass
 
-    def _takePicture(self):
+    def _takePicture(self) -> any:
         from random import choice
         import PIL
 
         random_image = choice(["geenvogel.jpg", "wateenkraai.jpg", "wateenmus.jpg"])
         logger.debug("Random image sent %s", random_image)
-        self.setImage(PIL.Image.open(random_image))
+        return PIL.Image.open(random_image)

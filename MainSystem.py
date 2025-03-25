@@ -31,9 +31,10 @@ class MainSystem:
         # Load the latest image from the camera which can be None if the camera is still busy
         latestImage = self.camera.getImage()
 
-        isDeniedBirdDetected = None
         if latestImage is not None:
-            isDeniedBirdDetected = self.classifier.isDeniedBird(latestImage)
+            self.classifier.scanImage(latestImage)
+
+        isDeniedBirdDetected : bool | None = self.classifier.getResult()
 
         # State machine
         # In each case the corresponding State class is called
