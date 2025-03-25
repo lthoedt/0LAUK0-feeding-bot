@@ -53,7 +53,14 @@ class MainSystem:
             case States.ACCEPTING_BIRD:
                 # Do
                 StateMethods.AcceptingBirdState.do(self)
-                if self.door.isOpen():
+                
+                if isDeniedBirdDetected:
+                    # Exit
+                    StateMethods.AcceptingBirdState.exit(self)
+                    self.CURRENT_STATE = States.DENYING_BIRD
+                    StateMethods.DenyingBirdState.entry(self)
+                
+                elif self.door.isOpen():
                     # Exit
                     StateMethods.AcceptingBirdState.exit(self)
                     self.CURRENT_STATE = States.SCANNING
