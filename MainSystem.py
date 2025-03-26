@@ -68,7 +68,9 @@ class MainSystem:
             case States.DENYING_BIRD:
                 # Do
                 StateMethods.DenyingBirdState.do(self)
-                if not isDeniedBirdDetected and StateMethods.DenyingBirdState.secondsSinceLastDeniedBird(self) > CLOSED_DOOR_TIMEOUT:
+                if isDeniedBirdDetected:
+                    StateMethods.DenyingBirdState.resetTimeSinceLastDeniedBird()
+                elif not isDeniedBirdDetected and StateMethods.DenyingBirdState.secondsSinceLastDeniedBird() > CLOSED_DOOR_TIMEOUT:
                     # Exit
                     StateMethods.DenyingBirdState.exit(self)
                     self.CURRENT_STATE = States.ACCEPTING_BIRD
