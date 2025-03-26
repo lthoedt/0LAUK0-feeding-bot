@@ -3,11 +3,10 @@ logger = logging.getLogger(__name__)
 
 from States import States
 import StateMethods
-from config import DRY_RUN
+from config import DRY_RUN, CLOSED_DOOR_TIMEOUT
 from components.Camera import Camera, FakeCamera
 from components.Classifier import Classifier
 from components.Door import Door, FakeDoor
-
 
 class MainSystem:
     def __init__(self) -> None:
@@ -25,6 +24,17 @@ class MainSystem:
         logger.debug("Finished initialising main system")
 
     def loop(self) -> None:
+        # Instruct camera to take a picture
+        self.camera.takePicture()
+
+        # Load the latest image from the camera which can be None if the camera is still busy
+        latestImage = self.camera.getImage()
+
+        if latestImage is not None:
+            self.classifier.scanImage(latestImage)
+
+        isDeniedBirdDetected : bool | None = self.classifier.getResult()
+
         # State machine
         # In each case the corresponding State class is called
         # The state class will have an entry, do, and exit method
@@ -34,7 +44,7 @@ class MainSystem:
         match self.CURRENT_STATE:
             case States.SCANNING:
                 StateMethods.ScanningState.do(self)
-                if self._deniedBirdDetected():
+                if isDeniedBirdDetected:
                     StateMethods.ScanningState.exit(self)
                     self.CURRENT_STATE = States.DENYING_BIRD
                     StateMethods.DenyingBirdState.entry(self)
@@ -42,7 +52,14 @@ class MainSystem:
             case States.ACCEPTING_BIRD:
                 # Do
                 StateMethods.AcceptingBirdState.do(self)
-                if self.door.isOpen():
+
+                if isDeniedBirdDetected:
+                    # Exit
+                    StateMethods.AcceptingBirdState.exit(self)
+                    self.CURRENT_STATE = States.DENYING_BIRD
+                    StateMethods.DenyingBirdState.entry(self)
+                
+                elif self.door.isOpen():
                     # Exit
                     StateMethods.AcceptingBirdState.exit(self)
                     self.CURRENT_STATE = States.SCANNING
@@ -51,11 +68,12 @@ class MainSystem:
             case States.DENYING_BIRD:
                 # Do
                 StateMethods.DenyingBirdState.do(self)
-                if not self._deniedBirdDetected():
+                if not isDeniedBirdDetected and StateMethods.DenyingBirdState.secondsSinceLastDeniedBird(self) > CLOSED_DOOR_TIMEOUT:
                     # Exit
                     StateMethods.DenyingBirdState.exit(self)
                     self.CURRENT_STATE = States.ACCEPTING_BIRD
                     StateMethods.AcceptingBirdState.entry(self)
 
-    def _deniedBirdDetected(self):
-        return self.classifier.isDeniedBird(self.camera.getImage())
+        # This image is now processed by the statemachine and is therefore old
+        latestImage = None
+        isDeniedBirdDetected = None

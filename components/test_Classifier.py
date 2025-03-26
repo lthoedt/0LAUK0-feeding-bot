@@ -3,6 +3,7 @@ import unittest
 
 from Classifier import Classifier
 
+from time import sleep
 
 class TestClassifier(unittest.TestCase):
     def test_connection(self):
@@ -13,15 +14,21 @@ class TestClassifier(unittest.TestCase):
 
     def test_no_birds(self):
         classifier = Classifier()
-        self.assertIsNone(classifier.isDeniedBird("geenvogel.jpg"))
+        classifier.scanImage("geenvogel.jpg")
+        sleep(5)
+        self.assertIsNone(classifier.getResult())
 
     def test_denied_bird(self):
         classifier = Classifier()
-        self.assertTrue(classifier.isDeniedBird("wateenkraai.jpg"))
+        classifier.scanImage("wateenkraai.jpg")
+        sleep(5)
+        self.assertTrue(classifier.getResult())
 
     def test_good_bird(self):
         classifier = Classifier()
-        self.assertFalse(classifier.isDeniedBird("wateenmus.jpg"))
+        classifier.scanImage("wateenmus.jpg")
+        sleep(5)
+        self.assertFalse(classifier.getResult())
 
 
 if __name__ == "__main__":
