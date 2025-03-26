@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 class Door:
     def __init__(self) -> None:
         self.servo = ServoWrapper(12, 0.4)
+        self.open()
 
     def open(self) -> None:
         logger.info("opening ...")
