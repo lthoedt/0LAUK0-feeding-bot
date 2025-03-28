@@ -1,4 +1,4 @@
-from ServoWrapper import ServoWrapper
+from .ServoWrapper import ServoWrapper
 import logging
 
 from config import DOOR_CLOSED_ANGLE, DOOR_OPENED_ANGLE
@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 class Door:
     def __init__(self) -> None:
         self.servo = ServoWrapper(12, 0.4)
+        self.open()
 
     def open(self) -> None:
         logger.info("opening ...")

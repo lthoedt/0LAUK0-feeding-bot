@@ -5,7 +5,7 @@ from States import States
 import StateMethods
 from config import DRY_RUN, CLOSED_DOOR_TIMEOUT
 from components.Camera import Camera, FakeCamera
-from components.Classifier import Classifier
+from components.Classifier import Classifier, Classifier
 from components.Door import Door, FakeDoor
 
 class MainSystem:
@@ -41,6 +41,9 @@ class MainSystem:
         # In each case an exit check is performed to determine if the state should change
         # Upon true, the exit method is called and the state is changed to the next state and the entry method is called
 
+        # print("Current state: ", self.CURRENT_STATE)
+        # print("Denied bird detected: ", isDeniedBirdDetected)
+
         match self.CURRENT_STATE:
             case States.SCANNING:
                 StateMethods.ScanningState.do(self)
@@ -68,7 +71,10 @@ class MainSystem:
             case States.DENYING_BIRD:
                 # Do
                 StateMethods.DenyingBirdState.do(self)
-                if not isDeniedBirdDetected and StateMethods.DenyingBirdState.secondsSinceLastDeniedBird(self) > CLOSED_DOOR_TIMEOUT:
+                self.door.isClosed()
+                if isDeniedBirdDetected:
+                    StateMethods.DenyingBirdState.resetTimeSinceLastDeniedBird()
+                elif not isDeniedBirdDetected and StateMethods.DenyingBirdState.secondsSinceLastDeniedBird() > CLOSED_DOOR_TIMEOUT:
                     # Exit
                     StateMethods.DenyingBirdState.exit(self)
                     self.CURRENT_STATE = States.ACCEPTING_BIRD
