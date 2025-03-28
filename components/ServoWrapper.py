@@ -4,7 +4,7 @@ import pigpio
 
 import threading
 import queue
-from Component import Component
+from .Component import Component
 
 targetAngleQueue = queue.Queue()
 

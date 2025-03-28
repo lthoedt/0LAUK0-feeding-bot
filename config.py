@@ -1,9 +1,11 @@
-DRY_RUN = True
+DRY_RUN = False
 # minimum time interval (in seconds) per tick
 # use this variable to prevent busy waiting
 ROBOT_MINIMUM_SPT = 0.5
 
-ROBOFLOW_HOST = "http://localhost:9001"
+# ROBOFLOW_HOST = "http://localhost:9001"
+ROBOFLOW_HOST = "http://192.168.137.72:9001"
+
 
 # Minimum time between two stored images in seconds
 TIME_BETWEEN_STORED_IMAGES = 1.0
