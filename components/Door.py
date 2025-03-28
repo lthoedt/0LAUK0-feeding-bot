@@ -1,4 +1,4 @@
-from ServoWrapper import ServoWrapper
+from .ServoWrapper import ServoWrapper
 import logging
 
 from config import DOOR_CLOSED_ANGLE, DOOR_OPENED_ANGLE

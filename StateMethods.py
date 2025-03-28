@@ -36,7 +36,7 @@ class DenyingBirdState(StateMethod):
     # But making these classes objects seems a bit wrong as well
     timeSinceLastDeniedBird = 0
     def entry(mainSystem):
-        resetTimeSinceLastDeniedBird()
+        DenyingBirdState.resetTimeSinceLastDeniedBird()
         mainSystem.door.close()
         pass
     def do(mainSystem):

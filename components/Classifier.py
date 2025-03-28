@@ -7,7 +7,8 @@ from inference_sdk import InferenceHTTPClient
 from os import makedirs
 from PIL.Image import Image
 from shutil import disk_usage
-from Component import Component
+from .Component import Component
+from time import sleep
 
 class Classifier(Component):
     # A bird blacklist: list of denied bird's model classes
@@ -71,21 +72,34 @@ class Classifier(Component):
         if result[0]["bird_class"] == []:
             # No birds were classified with a satisfactory confidence
             # This also means no denied birds were detected
-            logger.error("NO BIRD")
+            logger.info("NO BIRD")
             return None  # This is a false-y value in Python
 
-        # Get the bird class from the model prediction and store it for logging purposes
-        foundBird = result[0]["bird_class"][0]["top"]
-        logger.debug("classified a bird as '%s'", foundBird)
-        logger.info(
-            "BIRD: %s\t\tCONF: %0.2f",
-            foundBird,
-            result[0]["bird_class"][0]["confidence"],
-        )
-        self._storeImage(image, foundBird)
+        # Log object detection data for debugging
+        for prediction in result[0]['object_detection']['predictions']:
+            logger.debug('object detected %s with conf %.2f', prediction['class'], prediction['confidence'])
+
+        # Get the bird classes from the model prediction and store it for logging purposes
+        foundBirds = [classification["top"] for classification in result[0]["bird_class"]]
+        confidences = [classification["confidence"] for classification in result[0]["bird_class"]]
+        if not foundBirds:
+            logger.info("POSSIBLY BIRD, NOTHING CLASSIFIED")
+            return None
+
+        for idx,t in enumerate(zip(foundBirds, confidences)):
+            foundBird = t[0]
+            confidence = t[1]
+            logger.debug("classified a bird as '%s'", foundBird)
+            logger.info(
+                "BIRD %d: %s\t\tCONF: %0.2f",
+                idx,
+                foundBird,
+                confidence,
+            )
+            self._storeImage(image, foundBird)
 
         # Return true if the bird class is present in the blacklist
-        return foundBird in Classifier.deniedBirds
+        return any(foundBird in Classifier.deniedBirds for foundBird in foundBirds)
 
     def _storeImage(self, image: Image, birdClass: str):
         """
@@ -119,3 +133,12 @@ class Classifier(Component):
         logger.debug("stored image under %s", name)
 
         image.save(name)
+
+class FakeClassifier(Classifier):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _isDeniedBird(self, image) -> bool | None:
+        from random import choice
+        sleep(1)
+        return choice([True, False, False, False])
