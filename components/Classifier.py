@@ -7,7 +7,7 @@ from inference_sdk import InferenceHTTPClient
 from os import makedirs
 from PIL.Image import Image
 from shutil import disk_usage
-from Component import Component
+from .Component import Component
 
 class Classifier(Component):
     # A bird blacklist: list of denied bird's model classes

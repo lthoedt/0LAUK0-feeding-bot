@@ -7,7 +7,7 @@ except:
     pass
 from time import sleep
 
-from Component import Component
+from .Component import Component
 
 class Camera(Component):
     def __init__(self):
